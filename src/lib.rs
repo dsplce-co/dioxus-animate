@@ -1,6 +1,5 @@
+use dioxus::{document::document, prelude::*, web::WebEventExt};
 use std::{rc::Rc, time::Duration};
-
-use dioxus::{prelude::*, web::WebEventExt};
 
 #[derive(Clone, PartialEq)]
 pub enum Operation {
@@ -24,7 +23,7 @@ fn operate(patient: &web_sys::Element, operation: &Operation) {
             for class in classes {
                 let _ = patient.class_list().remove_1(class);
             }
-        },
+        }
         Operation::Group(operations) => {
             for operation in operations {
                 operate(patient, operation);
@@ -106,7 +105,7 @@ macro_rules! __expand_inner {
 }
 
 pub struct UseAnimate {
-    ops: Vec<(u64, Operation)>
+    ops: Vec<(u64, Operation)>,
 }
 
 impl UseAnimate {
@@ -131,12 +130,33 @@ impl UseAnimate {
             }
         });
     }
+
+    pub fn start_for_id(&self, id: &str) {
+        let ops = self.ops.clone();
+        use wasm_bindgen::JsCast;
+
+        let element = gloo::utils::document()
+            .get_element_by_id(id)
+            .and_then(|element| element.dyn_into::<web_sys::Element>().ok())
+            .expect("Element not found");
+
+        spawn(async move {
+            let mut time_elapsed = 0;
+
+            for (duration, operation) in ops.into_iter() {
+                let interval = duration - time_elapsed;
+
+                dioxus_time::sleep(Duration::from_millis(interval)).await;
+                time_elapsed += interval;
+
+                operate(&element, &operation);
+            }
+        });
+    }
 }
 
 pub fn _use_animate(ops: ReadOnlySignal<Vec<(u64, Operation)>>) -> UseAnimate {
-    UseAnimate {
-        ops: ops()
-    }
+    UseAnimate { ops: ops() }
 }
 
 pub mod prelude {

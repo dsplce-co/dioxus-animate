@@ -20,7 +20,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-animate = "0.1.0"
+dioxus-animate = "0.2.0"
 ```
 
 This crate requires Rust 2024 edition.
@@ -97,7 +97,11 @@ let animation = use_animate!(
 
 ### 4. Triggering Animations
 
-Animations are triggered by calling `start()` with a reference to the mounted element:
+Animations can be triggered in two ways:
+
+#### Method 1: Using Element References
+
+Call `start()` with a reference to the mounted element:
 
 ```rust
 // In your event handler
@@ -109,6 +113,32 @@ The element reference is obtained through the `onmounted` event:
 ```rust
 onmounted: move |event| element_ref.set(Some(event.data())),
 ```
+
+#### Method 2: Using Element ID
+
+Call `start_for_id()` with the element's ID string:
+
+```rust
+let animation = use_animate!(
+    300 => add("opacity-100"),
+    500 => remove("opacity-0"),
+);
+
+let trigger_animation = move |_| {
+    animation.start_for_id("target");
+};
+
+rsx! {
+    div {
+        id: "target",
+        class: "opacity-0 transition-all duration-300",
+        onclick: trigger_animation,
+        "Click me to animate!"
+    }
+}
+```
+
+This method is useful when you don't need to store element references or when targeting elements by ID is more convenient.
 
 ⸻
 
@@ -146,6 +176,26 @@ use_animate!(
 - Expressed in milliseconds
 - Cumulative from animation start
 - Must be in ascending order (think CSS keyframes)
+
+### Animation Methods
+
+#### `start(element_ref)`
+
+Starts the animation sequence on the provided element reference:
+
+```rust
+animation.start(element_ref.into());
+```
+
+#### `start_for_id(id)`
+
+Starts the animation sequence on an element with the specified ID:
+
+```rust
+animation.start_for_id("my-element");
+```
+
+This method is convenient when you prefer to target elements by ID rather than maintaining element references.
 
 ⸻
 
