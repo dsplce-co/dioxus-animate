@@ -1,0 +1,11 @@
+[package]
+name = "dioxus-animate"
+version = "0.1.0"
+edition = "2024"
+description = "Time-based CSS class manipulation for smooth animations in Dioxus apps"
+license = "MIT OR Apache-2.0"
+
+[dependencies]
+dioxus = { version = "0.6.3", features = ["web"] }
+dioxus-time = "0.1.0-alpha.1"
+web-sys = { version = "0.3.77", features = ["DomTokenList", "Element"] }
