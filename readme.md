@@ -2,7 +2,7 @@
 
 # dioxus-animate
 
-**CSS Class Animations for Dioxus** — Time-based CSS class manipulation for smooth animations in [Dioxus](https://dioxuslabs.com/) apps. This crate provides ergonomic macros to sequence CSS class additions and removals with precise timing control.
+✨ **CSS Class Animations for Dioxus** — Time-based CSS class manipulation for smooth animations in [Dioxus](https://dioxuslabs.com/) apps. This crate provides ergonomic macros to sequence CSS class additions and removals with precise timing control.
 
 ---
 
@@ -27,7 +27,7 @@ dioxus-animate = "0.2.0"
 
 This crate requires Rust 2024 edition.
 
-⸻
+---
 
 ## 🧪 Usage
 
@@ -142,7 +142,7 @@ rsx! {
 
 This method is useful when you don't need to store element references or when targeting elements by ID is more convenient.
 
-⸻
+---
 
 ## 🧠 How It Works
 
@@ -153,7 +153,7 @@ This method is useful when you don't need to store element references or when ta
 
 Time values are in milliseconds and represent cumulative time from animation start.
 
-⸻
+---
 
 ## 📐 API Reference
 
@@ -199,10 +199,20 @@ animation.start_for_id("my-element");
 
 This method is convenient when you prefer to target elements by ID rather than maintaining element references.
 
-⸻
+
+---
+
+## 📁 Repo & Contributions
+
+📦 Crate: [crates.io/crates/dioxus-animate](https://crates.io/crates/dioxus-animate)<br/>
+🛠️ Repo: [github.com/dsplce-co/dioxus-animate](https://github.com/dsplce-co/dioxus-animate)<br/>
+
+Contributions, issues, ideas? Hit us up 🖤
+
+---
 
 ## 🔒 License
 
 MIT or Apache-2.0, at your option.
 
-⸻
+---
