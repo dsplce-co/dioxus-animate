@@ -22,7 +22,7 @@ Add to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-animate = "0.2.0"
+dioxus-animate = "0.2"
 ```
 
 This crate requires Rust 2024 edition.

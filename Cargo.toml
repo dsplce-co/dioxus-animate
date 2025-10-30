@@ -1,6 +1,6 @@
 [package]
 name = "dioxus-animate"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 description = "Time-based CSS class manipulation for smooth animations in Dioxus apps"
 license = "MIT OR Apache-2.0"
