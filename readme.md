@@ -1,3 +1,5 @@
+> We're dsplce.co, check out our work on [github.com/dsplce-co](https://github.com/dsplce-co) 🖤
+
 # dioxus-animate
 
 **CSS Class Animations for Dioxus** — Time-based CSS class manipulation for smooth animations in [Dioxus](https://dioxuslabs.com/) apps. This crate provides ergonomic macros to sequence CSS class additions and removals with precise timing control.
