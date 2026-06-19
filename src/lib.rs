@@ -1,5 +1,5 @@
-use dioxus::{document::document, prelude::*, web::WebEventExt};
-use std::{rc::Rc, time::Duration};
+use dioxus::{prelude::*, web::WebEventExt};
+use std::rc::Rc;
 
 #[derive(Clone, PartialEq)]
 pub enum Operation {
@@ -109,7 +109,7 @@ pub struct UseAnimate {
 }
 
 impl UseAnimate {
-    pub fn start(&self, patient: ReadOnlySignal<Option<Rc<MountedData>>>) {
+    pub fn start(&self, patient: ReadSignal<Option<Rc<MountedData>>>) {
         let ops = self.ops.clone();
 
         spawn(async move {
@@ -122,7 +122,7 @@ impl UseAnimate {
             for (duration, operation) in ops.into_iter() {
                 let interval = duration - time_elapsed;
 
-                dioxus_time::sleep(Duration::from_millis(interval)).await;
+                async_std::task::sleep(instant::Duration::from_millis(interval)).await;
                 time_elapsed += interval;
 
                 let web_element = element.as_web_event();
@@ -146,7 +146,7 @@ impl UseAnimate {
             for (duration, operation) in ops.into_iter() {
                 let interval = duration - time_elapsed;
 
-                dioxus_time::sleep(Duration::from_millis(interval)).await;
+                async_std::task::sleep(instant::Duration::from_millis(interval)).await;
                 time_elapsed += interval;
 
                 operate(&element, &operation);
@@ -155,11 +155,10 @@ impl UseAnimate {
     }
 }
 
-pub fn _use_animate(ops: ReadOnlySignal<Vec<(u64, Operation)>>) -> UseAnimate {
+pub fn _use_animate(ops: ReadSignal<Vec<(u64, Operation)>>) -> UseAnimate {
     UseAnimate { ops: ops() }
 }
 
 pub mod prelude {
-    #[macro_use]
     pub use crate::use_animate;
 }

@@ -1,39 +1,71 @@
-> We're dsplce.co, check out our work on [github.com/dsplce-co](https://github.com/dsplce-co) 🖤
+> We're dsplce.co, check out our work on our website: [dsplce.co](https://dsplce.co) 🖤
 
 # dioxus-animate
 
-✨ **CSS Class Animations for Dioxus** — Time-based CSS class manipulation for smooth animations in [Dioxus](https://dioxuslabs.com/) apps. This crate provides ergonomic macros to sequence CSS class additions and removals with precise timing control.
+[![Dioxus](https://img.shields.io/badge/Dioxus-000000?style=for-the-badge&logo=rust&logoColor=white)](https://dioxuslabs.com/)
+[![crates.io Downloads](https://img.shields.io/crates/d/dioxus-animate?style=for-the-badge&color=%23FF0346)](https://crates.io/crates/dioxus-animate)
+[![crates.io Size](https://img.shields.io/crates/size/dioxus-animate?style=for-the-badge)](https://crates.io/crates/dioxus-animate)
+[![License](https://img.shields.io/crates/l/dioxus-animate.svg?style=for-the-badge)](https://crates.io/crates/dioxus-animate)
+[![crates.io](https://img.shields.io/crates/v/dioxus-animate?style=for-the-badge&color=%230F80C1)](https://crates.io/crates/dioxus-animate)
 
----
+✨ Time-based CSS class animations for [Dioxus](https://dioxuslabs.com/) — think CSS keyframes, but driven by your app's logic.
+
+`dioxus-animate` gives you one ergonomic macro to sequence CSS class additions and removals on a timeline. You say "at 300ms add `opacity-100`, at 500ms remove `opacity-0`", it runs the sequence asynchronously against a real DOM element. No animation runtime, no state machine to wire up — you already have the CSS, this just toggles the classes for you at the right moments.
+
+Plays nicely with utility-class frameworks like Tailwind, where the transitions live in the classes and all you need is something to flip them on cue.
 
 ## 🖤 Features
 
-✅ Time-based CSS class manipulation<br>
-✅ Ergonomic macro-based API<br>
-✅ Group multiple operations together<br>
-✅ Async-powered with no blocking<br>
-✅ Type-safe animation sequences<br>
+- **`use_animate!`** — one declarative macro, your whole sequence reads top-to-bottom like keyframes
+- **`add` / `remove`** — the only two verbs you need; classes go on, classes come off
+- **Grouped ops** — fire several class changes at the exact same tick with `(...)`
+- **Async under the hood** — sequences run on Dioxus' task runtime, nothing blocks
+- **Two ways to target** — by mounted element reference, or by plain element `id`
 
 ---
+
+## Table of Contents
+
+- [🖤 Features](#-features)
+- [📦 Installation](#-installation)
+- [🧪 Usage](#-usage)
+  - [Basic animation sequence](#basic-animation-sequence)
+  - [Grouped operations](#grouped-operations)
+  - [Complex sequences](#complex-sequences)
+  - [Trigger via element reference](#trigger-via-element-reference)
+  - [Trigger via element id](#trigger-via-element-id)
+- [🧠 How It Works](#-how-it-works)
+- [📐 API Reference](#-api-reference)
+- [🛠️ Compatibility](#%EF%B8%8F-compatibility)
+- [📁 Repo & Contributions](#-repo--contributions)
+- [📄 License](#-license)
+
+⸻
 
 ## 📦 Installation
 
-Add to your `Cargo.toml`:
+Add it to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-dioxus-animate = "0.2"
+dioxus-animate = "0.3"
 ```
 
-This crate requires Rust 2024 edition.
+Or let cargo do the editing:
 
----
+```bash
+cargo add dioxus-animate
+```
+
+The latest version targets **Dioxus 0.7** and the **web (WASM) renderer** — see the [compatibility table](#%EF%B8%8F-compatibility) for the version mapping. Built on the Rust 2024 edition, so you'll want a recent stable toolchain.
+
+⸻
 
 ## 🧪 Usage
 
-### 1. Basic Animation Sequence
+### Basic animation sequence
 
-Use the `use_animate!` macro to create timed CSS class operations:
+Reach for the `use_animate!` macro to lay out timed CSS class operations, then call `start` on a mounted element:
 
 ```rust
 use dioxus::prelude::*;
@@ -64,9 +96,9 @@ fn App() -> Element {
 }
 ```
 
-### 2. Grouped Operations
+### Grouped operations
 
-Execute multiple class operations simultaneously using parentheses:
+Wrap operations in parentheses (separated by `;`) to fire them on the same tick:
 
 ```rust
 let animation = use_animate!(
@@ -79,9 +111,9 @@ let animation = use_animate!(
 );
 ```
 
-### 3. Complex Animation Sequences
+### Complex sequences
 
-Chain multiple operations with precise timing:
+Chain as many steps as you like — single ops and groups mix freely:
 
 ```rust
 let animation = use_animate!(
@@ -97,28 +129,23 @@ let animation = use_animate!(
 );
 ```
 
-### 4. Triggering Animations
+One thing to keep in mind: timestamps are cumulative from the start and must climb in ascending order (same as you'd write CSS keyframes). The runtime sleeps for the gap between each step, so a step that goes backwards in time isn't a thing.
 
-Animations can be triggered in two ways:
+### Trigger via element reference
 
-#### Method 1: Using Element References
-
-Call `start()` with a reference to the mounted element:
+Capture the element on `onmounted`, then hand its reference to `start`:
 
 ```rust
-// In your event handler
+// grab it when the node mounts
+onmounted: move |event| element_ref.set(Some(event.data())),
+
+// fire it from any handler
 animation.start(element_ref.into());
 ```
 
-The element reference is obtained through the `onmounted` event:
+### Trigger via element id
 
-```rust
-onmounted: move |event| element_ref.set(Some(event.data())),
-```
-
-#### Method 2: Using Element ID
-
-Call `start_for_id()` with the element's ID string:
+Don't want to juggle references? Target by `id` with `start_for_id` instead — handy when the element lives somewhere awkward to thread a signal to:
 
 ```rust
 let animation = use_animate!(
@@ -140,26 +167,26 @@ rsx! {
 }
 ```
 
-This method is useful when you don't need to store element references or when targeting elements by ID is more convenient.
+Heads up: `start_for_id` expects the element to exist in the DOM at call time — it looks the node up by id and will panic if there's nothing there, so trigger it after the element has mounted.
 
----
+⸻
 
 ## 🧠 How It Works
 
-1. **Define**: Use `use_animate!` to define your animation sequence with timestamps and operations
-2. **Mount**: Capture element reference with `onmounted`
-3. **Trigger**: Call `animation.start(element_ref.into())` to begin the sequence
-4. **Execute**: Operations run asynchronously at their specified times
+1. **Define** — `use_animate!` parses your `time => operation` lines into an ordered list of `(ms, Operation)` pairs
+2. **Mount** — capture the element reference via `onmounted` (or skip it and target by `id`)
+3. **Trigger** — `start(...)` / `start_for_id(...)` spawns an async task on Dioxus' runtime
+4. **Execute** — the task sleeps to each timestamp in turn and toggles the classes on the live DOM element
 
-Time values are in milliseconds and represent cumulative time from animation start.
+Time values are in milliseconds, cumulative from the start of the sequence.
 
----
+⸻
 
 ## 📐 API Reference
 
 ### `use_animate!`
 
-Creates an animation sequence with the following syntax:
+Builds an animation sequence:
 
 ```rust
 use_animate!(
@@ -170,49 +197,58 @@ use_animate!(
 ```
 
 **Operations:**
-- `add("class-names")` - Adds CSS classes to the element
-- `remove("class-names")` - Removes CSS classes from the element
-- `(op1; op2; ...)` - Groups multiple operations to execute simultaneously
+
+- `add("class-names")` — adds CSS classes (space-separated string, multiple classes welcome)
+- `remove("class-names")` — removes CSS classes (same deal)
+- `(op1; op2; ...)` — groups operations to run on the same tick
 
 **Time values:**
-- Expressed in milliseconds
-- Cumulative from animation start
-- Must be in ascending order (think CSS keyframes)
 
-### Animation Methods
+- expressed in milliseconds
+- cumulative from animation start
+- must be in ascending order (think CSS keyframes)
 
-#### `start(element_ref)`
-
-Starts the animation sequence on the provided element reference:
+### `UseAnimate::start`
 
 ```rust
 animation.start(element_ref.into());
 ```
 
-#### `start_for_id(id)`
+Runs the sequence against a mounted element. Takes a `ReadSignal<Option<Rc<MountedData>>>` — in practice the `Signal` you filled on `onmounted`, with `.into()`. If the signal is still `None`, the call is a no-op (it just won't animate).
 
-Starts the animation sequence on an element with the specified ID:
+### `UseAnimate::start_for_id`
 
 ```rust
 animation.start_for_id("my-element");
 ```
 
-This method is convenient when you prefer to target elements by ID rather than maintaining element references.
+Runs the sequence against the element with the given `id`. Convenient when you'd rather not hold a reference — just make sure the element is in the DOM when you call it (it panics if the id isn't found).
 
+⸻
 
----
+## 🛠️ Compatibility
+
+| Dioxus version | `dioxus-animate` version |
+|:---------------|:-------------------------|
+| `0.7`          | `0.3`                    |
+| `0.6`          | `0.2`                    |
+
+A couple of things worth knowing:
+
+- **Web / WASM only** — it reaches for `web-sys`, `gloo` and Dioxus' web event APIs, so it runs in the browser renderer (it isn't wired up for desktop/mobile).
+- **Rust 2024 edition** — you'll want a recent stable toolchain.
+
+⸻
 
 ## 📁 Repo & Contributions
 
-📦 Crate: [crates.io/crates/dioxus-animate](https://crates.io/crates/dioxus-animate)<br/>
-🛠️ Repo: [github.com/dsplce-co/dioxus-animate](https://github.com/dsplce-co/dioxus-animate)<br/>
+🛠️ **Repo**: [https://github.com/dsplce-co/dioxus-animate](https://github.com/dsplce-co/dioxus-animate)<br>
+📦 **Crate**: [https://crates.io/crates/dioxus-animate](https://crates.io/crates/dioxus-animate)
 
 Contributions, issues, ideas? Hit us up 🖤
 
----
+⸻
 
-## 🔒 License
+## 📄 License
 
 MIT or Apache-2.0, at your option.
-
----
