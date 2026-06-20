@@ -661,7 +661,7 @@ dependencies = [
 
 [[package]]
 name = "dioxus-animate"
-version = "0.3.1"
+version = "0.3.2"
 dependencies = [
  "async-std",
  "dioxus",
